@@ -1,16 +1,19 @@
-const Potion = require('../lib/Potion.js');
+const Intern = require('../lib/Intern.js');
 
-test('creates a health potion object', () => {
-  const potion = new Potion('health');
+test('creates an Intern object', () => {
+  const Employee = new Intern('james', '25', 'james@gmail.com', 'Intern');
 
-  expect(potion.name).toBe('health');
-  expect(potion.value).toEqual(expect.any(Number));
+  expect(Employee.getRole).toBe('Intern');
 });
 
-test('creates a random potion object', () => {
-  const potion = new Potion();
+test('creates school', () => {
+  const Employee = new Intern('james', '25', 'james@gmail.com', 'Intern');
+  expect(Employee.School()).toBe('Harvard');
+  
+});
 
-  expect(potion.name).toEqual(expect.any(String));
-  expect(potion.name.length).toBeGreaterThan(0);
-  expect(potion.value).toEqual(expect.any(Number));
+test('creates an Intern school', () => {
+  const Employee = new Intern('james', '25', 'james@gmail.com', 'Harvard');
+  expect(Employee.getSchool()).toBe('Harvard');
+  
 });
