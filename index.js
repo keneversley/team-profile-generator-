@@ -1,214 +1,180 @@
-
-   
-const inquirer = require("inquirer");
-
-const Employee = require("./lib/Employee.js");
+const Manager = require("./lib/Manager.js");
 const Engineer = require("./lib/Engineer.js");
 const Intern = require("./lib/Intern.js");
-const Manager = require("./lib/Manager.js");
-
+const inquirer = require("inquirer");
+const path = require("path");
 const fs = require("fs");
+const outputPath = path.join("newfile.html");
+const generateTeam = require("./src/template.js")
 
-
-function runInquirer() {
-    const promptArray = [{
-        type: "input",
-        message: "What is your name?",
-        name: "name"
-    }, {
-        type: "input",
-        message: "What is your ID?",
-        name: "id"
-    }, {
-        type: "input",
-        message: "What is your email?",
-        name: "email"
-    }, {
-        type: "list",
-        message: "What is your title",
-        choices: ["Manager", "Engineer", "Intern"],
-        name: "title"
-    }];
-
-    return inquirer
-        .prompt(promptArray);
-}
-
-function runInquirerManager() {
-    const promptArray = [{
-        type: "input",
-        message: "What is your office number?",
-        name: "officeNumber"
-    }];
-
-    return inquirer
-        .prompt(promptArray);
-}
-
-function runInquirerEngineer() {
-    const promptArray = [{
-        type: "input",
-        message: "What is your github?",
-        name: "github"
-    }];
-
-    return inquirer
-        .prompt(promptArray);
-}
-
-function runInquirerIntern() {
-    const promptArray = [{
-        type: "input",
-        message: "What school do you attend?",
-        name: "school"
-    }];
-
-    return inquirer
-        .prompt(promptArray);
-}
-
-
-async function run() {
-    let employeeArray = [];
-    const maxTimes = 4;
-    for (i = 0; i < maxTimes; i++) {
-        const promise = new Promise((resolve, reject) => {
-            runInquirer()
-                .then(function ({ name, id, email, title }) {
-
-                    if (title === "Manager") {
-                        runInquirerManager().then(function ({ officeNumber }) {
-                            this.employee = new Manager(name, id, email, officeNumber, title);
-                            console.log(officeNumber);
-                            employeeArray.push(employee);
-                            resolve("done");
-                        });
-
-                    } else if (title === "Engineer") {
-                        runInquirerEngineer().then(function ({ github }) {
-                            this.employee = new Engineer(name, id, email, github, title);
-                            console.log(github);
-                            employeeArray.push(employee);
-                            resolve("done");
-                        });
-                    } else if (title === "Intern") {
-                        runInquirerIntern().then(function ({ school }) {
-                            this.employee = new Intern(name, id, email, school, title);
-                            console.log(school);
-                            employeeArray.push(employee);
-                            resolve("done");
-                        });
-                    }
-
-                }).catch(function (err) {
-                    console.log("There was an error.");
-                    console.log(err);
-                });
-        });
-
-        const result = await promise;
-        console.log(result);
-    }
-
-    // console.log(employeeArray.length);
-
-    function displayTitle(employee) {
-        if (employee.title === "Manager") {
-            console.log(employee.officeNumber);
-            return `office number: ${employee.officeNumber}`;
-        }
-
-        if (employee.title === "Intern") {
-            return `school: ${employee.school}`;
-        }
-
-        if (employee.title === "Engineer") {
-            return `gitHub: ${employee.github}`;
-        }
-
-    }
-    function getCardHtml() {
-        let html = "";
-        for (j = 0; j < maxTimes; j++) {
-            console.log(employeeArray[j])
-            html += `<div class="card bg-dark justify-content-center align-items-center" style="width: 18rem;">
-                <div class="col card-header">
-                    <h4>${employeeArray[j].name}</h4>
-                </div>
-                <div class="col card-header">
-                    <h4>${employeeArray[j].title}</h4 >
-                </div >
-                <ul class="list-group list-group-flush text">
-                    <li class="list-group-item">ID: ${employeeArray[j].id}</li>
-                    <li class="list-group-item">Email: ${employeeArray[j].email}</li>
-                    <li class="list-group-item"> ${displayTitle(employeeArray[j])}</li>
-                </ul>
-            </div > `;
-        }
-        return html;
-    }
+teamArray = [];
 
 
 
-    let html = `< !DOCTYPE html >
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                                    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-                                        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-                                        <title>Document</title>
-                                        <style>
-                                            .row {
-                                                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                margin-top: 20px;
-                margin-bottom: 20px;
-            }
-            .card {
-                                                padding: 15px;
-                border-radius: 6px;
-                background-color: white;
-                color: lightskyblue;
-                margin: 15px;
-            }
-            .text {
-                                                padding: 15px;
-                border-radius: 6px;
-                background-color: lightskyblue;
-                color: black;
-                margin: 15px;
-            }
-            .col {
-                                                flex: 1;
-                text-align: center;
-            }
-        </style>
-    </head>
-                                    <body>
-                                        <nav class="navbar navbar-dark bg-dark justify-content-center align-items-center">
-                                            <span class="navbar-brand mb-0 h1">
-                                                <h1>My Team</h1>
-                                            </span>
-                                        </nav>
-                                        <div class="row">
-                                            ${getCardHtml()}
-                                        </div>
-                                    </body>
+function runApp () {
+
+  function createTeam () {
+    inquirer.prompt([{
+      type: "list",
+      message: "What type of employee would you like to add to your team?",
+      name: "addEmployeePrompt",
+      choices: ["Manager", "Engineer", "Intern", "No more team members are needed."]
+    }]).then(function (userInput) {
+      switch(userInput.addEmployeePrompt) {
+        case "Manager":
+          addManager();
+          break;
+        case "Engineer":
+          addEngineer();
+          break;
+        case "Intern":
+          addIntern();
+          break;
+
+        default:
+          htmlBuilder();
+      }
+    })
+  }
+// OOP Functions
+
+function addManager() {
+  inquirer.prompt ([
     
-    </html>
-    `;
+    {
+      type: "input",
+      name: "managerName",
+      message: "What is the manager's name?"
+    },
 
+    {
+      type: "input",
+      name: "managerId",
+      message: "What is the manager's employee ID number?"
+    },
 
+    {
+      type: "input",
+      name: "managerEmail",
+      message: "What is the manager's email address?"
+    },
 
+    {
+      type: "input",
+      name: "managerOfficeNumber",
+      message: "What is the manager's office number?"
+    }
 
-    console.log(html);
-    const fs = require("fs");
-    fs.writeFile('newfile.html', html, function (err) {
-        if (err) throw err;
-        console.log('File is created successfully.');
-    });
+  ]).then(answers => {
+    const manager = new Manager(answers.managerName, answers.managerId, answers.managerEmail, answers.managerOfficeNumber);
+    teamArray.push(manager);
+    createTeam();
+  });
+
 }
-run()
+
+
+function addEngineer() {
+    inquirer.prompt([
+      
+      {
+        type: "input",
+        name: "engineerName",
+        message: "What is the engineer's name?"
+      },
+
+      {
+        type: "input",
+        name: "engineerId",
+        message: "What is the engineer's employee ID number?" 
+      },
+
+      {
+        type: "input",
+        name: "engineerEmail",
+        message: "What is the engineer's email address?"
+      },
+
+      {
+        type: "input",
+        name: "engineerGithub",
+        message: "What is the engineer's GitHub username?"
+      }
+
+    ]).then(answers => {
+      const engineer = new Engineer(answers.engineerName, answers.engineerId, answers.engineerEmail, answers.engineerGithub);
+      teamArray.push(engineer);
+      createTeam();
+    });
+
+  }
+
+  function addIntern() {
+    inquirer.prompt([
+      
+      {
+        type: "input",
+        name: "internName",
+        message: "What is the intern's name?"
+      },
+
+      {
+        type: "input",
+        name: "internId",
+        message: "What is the intern's employee ID number?" 
+      },
+
+      {
+        type: "input",
+        name: "internEmail",
+        message: "What is the intern's email address?"
+      },
+
+      {
+        type: "input",
+        name: "internSchool",
+        message: "What school does the intern attend?"
+      }
+
+    ]).then(answers => {
+      const intern = new Intern(answers.internName, answers.internId, answers.internEmail, answers.internSchool);
+      teamArray.push(intern);
+      createTeam();
+    });
+
+  }
+
+  // return to menu with option to add another team member create team
+
+  // Would you like to add a team member?
+  // Yes || No
+  // If Yes --> Then select an employee role for your new team member: Manager, Engineer, Intern
+  // If No --> Create Team
+
+
+function htmlBuilder () {
+    console.log("Team created!")
+
+    fs.writeFileSync(outputPath, generateTeam(teamArray), "UTF-8")
+
+}
+
+createTeam();
+
+}
+
+runApp();
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
